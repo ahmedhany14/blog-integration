@@ -57,6 +57,7 @@ export class BlogService {
         await this.blogRepositoryService.downvoteBlog(id, inc);
     }
 
-    async getBlogs(author_id: number) {
+    async getBlogs(author_id: number, page: number) {
+        return await this.blogRepositoryService.getBlogs(author_id, page)
     }
 }

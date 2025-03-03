@@ -33,4 +33,13 @@ export class BlogRepositoryService {
             throw new InternalServerErrorException('Error updating blog');
         }
     }
+
+    async deleteBlog(blog: Blog) {
+        try {
+            await this.blogModel.findByIdAndDelete(blog._id);
+        } catch (err) {
+            throw new InternalServerErrorException('Error deleting blog');
+        }
+
+    }
 }

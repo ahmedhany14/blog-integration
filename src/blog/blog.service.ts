@@ -30,7 +30,15 @@ export class BlogService {
         return await this.blogRepositoryService.updateBlog(blog, updateBlogDto);
     }
 
-    async deleteBlog(id: string) {
+    async deleteBlog(
+        author_id: number,
+        blog_id: string
+    ) {
+        const blog = await this.blogRepositoryService.getOneBlog(blog_id);
+        if (!blog) throw new NotFoundException('Blog not found');
+        if (blog.author_id !== author_id) throw new UnauthorizedException('You are not authorized to update this blog');
+
+        await this.blogRepositoryService.deleteBlog(blog);
     }
 
     async upvoteBlog(id: string) {

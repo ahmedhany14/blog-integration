@@ -46,27 +46,13 @@ export class Blog extends Document {
     })
     downvotes: number;
 
-    @Prop({
-        type: mongoose.Schema.Types.Date,
-        required: true,
-        default: new Date(),
-
-    })
-    created_at: Date;
-
-    @Prop({
-        type: mongoose.Schema.Types.Date,
-        required: true,
-        default: new Date(),
-    })
-    updated_at: Date;
 
     @Prop({
         required: true,
         isInteger: true,
         MIN_VALUE: 0,
     })
-    author_id: null;
+    author_id: number;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

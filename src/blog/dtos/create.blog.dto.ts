@@ -2,13 +2,15 @@ import {
     IsString,
     IsNotEmpty,
     MinLength,
+    MaxLength
 } from 'class-validator';
 
 export class CreateBlogDto {
+
     @IsString()
     @IsNotEmpty()
     @MinLength(5)
-    @MinLength(100)
+    @MaxLength(100)
     title: string;
 
 

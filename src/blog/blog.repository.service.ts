@@ -69,4 +69,13 @@ export class BlogRepositoryService {
             throw new InternalServerErrorException('Error downvoting blog');
         }
     }
+
+    async getBlogs(author_id: number, page = 1) {
+        try {
+            return await this.blogModel.find().where('author_id').equals(author_id).skip((page - 1) * 10).limit(10);
+        } catch (err) {
+            throw new InternalServerErrorException('Error fetching blogs');
+        }
+    }
+
 }

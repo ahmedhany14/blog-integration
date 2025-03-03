@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dtos/create.blog.dto';
 import { ObjectIdValidationPipe } from './validators/object.id.validation.pipe';
@@ -42,12 +42,13 @@ export class BlogController {
         return { message: 'Blog fetched', blog };
     }
 
-    @Post('get-blogs/:author_id')
+    @Get('get-blogs/:author_id')
     async getBlogs(
         @Param('author_id', ParseIntPipe) author_id: number,
+        @Query('page', ParseIntPipe) page: number,
     ) {
-        const blogs = await this.blogService.getBlogs(author_id);
-        return { message: 'Blogs fetched' };
+        const blogs = await this.blogService.getBlogs(author_id, page);
+        return { message: 'Blogs fetched', blogs };
     }
 
     @Patch('update-blog/:author_id/:blog_id')
@@ -85,7 +86,7 @@ export class BlogController {
 
         if (!blog) throw new NotFoundException('Blog not found');
 
-        const ret = await this.blogRedisCachingService.setUpVote(blog_id, upvoter_id); 
+        const ret = await this.blogRedisCachingService.setUpVote(blog_id, upvoter_id);
 
         await this.blogService.upvoteBlog(blog_id, ret.upvote);
         await this.blogService.downvoteBlog(blog_id, ret.downvote);

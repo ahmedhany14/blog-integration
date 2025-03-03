@@ -51,4 +51,22 @@ export class BlogRepositoryService {
         }
 
     }
+
+
+    async upvoteBlog(id: string, inc: number) {
+        try {
+            await this.blogModel.findByIdAndUpdate(id, { $inc: { upvotes: inc } });
+        } catch (err) {
+            throw new InternalServerErrorException('Error upvoting blog');
+        }
+    }
+
+    async downvoteBlog(id: string, inc: number) {
+        try {
+            await this.blogModel.findByIdAndUpdate(id, { $inc: { downvotes: inc } });
+        }
+        catch (err) {
+            throw new InternalServerErrorException('Error downvoting blog');
+        }
+    }
 }

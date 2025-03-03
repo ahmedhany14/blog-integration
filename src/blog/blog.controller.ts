@@ -3,11 +3,15 @@ import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dtos/create.blog.dto';
 import { ObjectIdValidationPipe } from './validators/object.id.validation.pipe';
 import { UpdateBlogDto } from './dtos/update.blog.dto';
+import { BlogRedisCachingService } from '../redis/services/blog.redis.caching.service';
 @Controller('blog')
 export class BlogController {
     constructor(
         @Inject()
         private readonly blogService: BlogService,
+
+        @Inject()
+        private readonly blogRedisCachingService: BlogRedisCachingService
 
     ) { }
 
@@ -22,9 +26,19 @@ export class BlogController {
 
     @Get('get-one-blog/:blog_id')
     async getOneBlog(
-        @Param('blog_id', ObjectIdValidationPipe) id: string,
+        @Param('blog_id', ObjectIdValidationPipe) blog_id: string,
     ) {
-        const blog = await this.blogService.getOneBlog(id);
+        /*
+            Cache the views of the blog
+        */
+        let blog;
+
+        // NOTE: The second arg will be fixed after adding authentication
+        if (await this.blogRedisCachingService.incViews(blog_id, 10))
+            blog = await this.blogService.incrementViews(blog_id);
+        else
+            blog = await this.blogService.getOneBlog(blog_id);
+
         return { message: 'Blog fetched', blog };
     }
 

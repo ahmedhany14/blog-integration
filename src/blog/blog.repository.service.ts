@@ -25,6 +25,15 @@ export class BlogRepositoryService {
         }
     }
 
+    async incrementViews(blog: Blog) {
+        try {
+            blog.views += 1;
+            return await blog.save();
+        } catch (err) {
+
+        }
+    }
+
 
     async updateBlog(blog: Blog, updateBlogDto: UpdateBlogDto) {
         try {

@@ -18,6 +18,14 @@ export class BlogService {
         return await this.blogRepositoryService.getOneBlog(id);
     }
 
+    async incrementViews(blog_id: string) {
+        const blog = await this.blogRepositoryService.getOneBlog(blog_id);
+        if (!blog) throw new NotFoundException('Blog not found');
+
+        return await this.blogRepositoryService.incrementViews(blog);
+    }
+
+
     async updateBlog(
         updateBlogDto: UpdateBlogDto,
         blog_id: string,

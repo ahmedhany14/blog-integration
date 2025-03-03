@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 
 import { ConfigurationsModule } from './../config/config.module';
 import { ConfigService } from 'src/config/config.service';
+import { BlogRedisCachingService } from './services/blog.redis.caching.service';
 
 @Module({
     imports: [ConfigurationsModule],
@@ -19,9 +20,10 @@ import { ConfigService } from 'src/config/config.service';
                 });
             },
         },
+        BlogRedisCachingService,
     ],
 
-    exports: ['REDIS_CLIENT'],
+    exports: [BlogRedisCachingService],
 
 })
 export class RedisModule { }

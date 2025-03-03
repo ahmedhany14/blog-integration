@@ -25,6 +25,15 @@ export class BlogRepositoryService {
         }
     }
 
+    async incrementViews(blog: Blog) {
+        try {
+            blog.views += 1;
+            return await blog.save();
+        } catch (err) {
+
+        }
+    }
+
 
     async updateBlog(blog: Blog, updateBlogDto: UpdateBlogDto) {
         try {
@@ -41,5 +50,23 @@ export class BlogRepositoryService {
             throw new InternalServerErrorException('Error deleting blog');
         }
 
+    }
+
+
+    async upvoteBlog(id: string, inc: number) {
+        try {
+            await this.blogModel.findByIdAndUpdate(id, { $inc: { upvotes: inc } });
+        } catch (err) {
+            throw new InternalServerErrorException('Error upvoting blog');
+        }
+    }
+
+    async downvoteBlog(id: string, inc: number) {
+        try {
+            await this.blogModel.findByIdAndUpdate(id, { $inc: { downvotes: inc } });
+        }
+        catch (err) {
+            throw new InternalServerErrorException('Error downvoting blog');
+        }
     }
 }

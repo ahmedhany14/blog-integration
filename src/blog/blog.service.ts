@@ -18,6 +18,14 @@ export class BlogService {
         return await this.blogRepositoryService.getOneBlog(id);
     }
 
+    async incrementViews(blog_id: string) {
+        const blog = await this.blogRepositoryService.getOneBlog(blog_id);
+        if (!blog) throw new NotFoundException('Blog not found');
+
+        return await this.blogRepositoryService.incrementViews(blog);
+    }
+
+
     async updateBlog(
         updateBlogDto: UpdateBlogDto,
         blog_id: string,
@@ -41,10 +49,12 @@ export class BlogService {
         await this.blogRepositoryService.deleteBlog(blog);
     }
 
-    async upvoteBlog(id: string) {
+    async upvoteBlog(id: string, inc: number) {
+        await this.blogRepositoryService.upvoteBlog(id, inc);
     }
 
-    async downvoteBlog(id: string) {
+    async downvoteBlog(id: string, inc: number) {
+        await this.blogRepositoryService.downvoteBlog(id, inc);
     }
 
     async getBlogs(author_id: number) {

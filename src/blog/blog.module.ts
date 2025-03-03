@@ -4,6 +4,7 @@ import { Blog, BlogSchema } from './entity/blog.entity';
 import { BlogController } from './blog.controller';
 import { BlogService } from './blog.service';
 import { BlogRepositoryService } from './blog.repository.service';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { BlogRepositoryService } from './blog.repository.service';
                 schema: BlogSchema,
             },
         ]),
+        RedisModule
     ],
     controllers: [BlogController],
     providers: [BlogService, BlogRepositoryService],

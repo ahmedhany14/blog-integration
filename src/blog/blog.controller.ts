@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dtos/create.blog.dto';
 import { ObjectIdValidationPipe } from './validators/object.id.validation.pipe';
@@ -19,9 +19,9 @@ export class BlogController {
         return { message: 'Blog created', blog };
     }
 
-    @Post('get-one-blog/:blog_id')
+    @Get('get-one-blog/:blog_id')
     async getOneBlog(
-        @Param('blog_id',) id: string,
+        @Param('blog_id', ObjectIdValidationPipe) id: string,
     ) {
         const blog = await this.blogService.getOneBlog(id);
         return { message: 'Blog fetched', blog };

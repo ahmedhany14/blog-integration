@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BlogDocument, Blog } from './entity/blog.entity';
@@ -19,6 +19,11 @@ export class BlogService {
     }
 
     async getOneBlog(id: string) {
+        try {
+            return await this.blogModel.findById(id);
+        } catch (err) {
+            throw new InternalServerErrorException('Error fetching blog');
+        }
     }
 
     async updateBlog(id: string) {

@@ -1,32 +1,33 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { BlogDocument, Blog } from './entity/blog.entity';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateBlogDto } from './dtos/create.blog.dto';
+import { UpdateBlogDto } from './dtos/update.blog.dto';
+import { BlogRepositoryService } from './blog.repository.service';
 @Injectable()
 export class BlogService {
     constructor(
-        @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
+        @Inject()
+        private readonly blogRepositoryService: BlogRepositoryService,
     ) { }
 
 
     async createBlog(createBlogDto: CreateBlogDto, author_id: number) {
-        const blog = new this.blogModel({
-            ...createBlogDto,
-            author_id: author_id
-        });
-        return await blog.save();
+        return await this.blogRepositoryService.createBlog(createBlogDto, author_id);
     }
 
     async getOneBlog(id: string) {
-        try {
-            return await this.blogModel.findById(id);
-        } catch (err) {
-            throw new InternalServerErrorException('Error fetching blog');
-        }
+        return await this.blogRepositoryService.getOneBlog(id);
     }
 
-    async updateBlog(id: string) {
+    async updateBlog(
+        updateBlogDto: UpdateBlogDto,
+        blog_id: string,
+        author_id: number
+    ) {
+        const blog = await this.blogRepositoryService.getOneBlog(blog_id);
+        if (!blog) throw new NotFoundException('Blog not found');
+        if (blog.author_id !== author_id) throw new UnauthorizedException('You are not authorized to update this blog');
+
+        return await this.blogRepositoryService.updateBlog(blog, updateBlogDto);
     }
 
     async deleteBlog(id: string) {

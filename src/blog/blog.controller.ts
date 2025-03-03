@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dtos/create.blog.dto';
 import { ObjectIdValidationPipe } from './validators/object.id.validation.pipe';
+import { UpdateBlogDto } from './dtos/update.blog.dto';
 @Controller('blog')
 export class BlogController {
     constructor(
@@ -35,13 +36,15 @@ export class BlogController {
         return { message: 'Blogs fetched' };
     }
 
-    @Post('update-blog/:blog_id')
+    @Patch('update-blog/:author_id/:blog_id')
     async updateBlog(
-        @Param('blog_id') id: string,
-    ) {
-        const blog = await this.blogService.updateBlog(id);
+        @Param('author_id', ParseIntPipe) author_id: number,
+        @Param('blog_id', ObjectIdValidationPipe) blog_id: string,
+        @Body() updateBlogDto: UpdateBlogDto,
+    ) { 
+        const blog = await this.blogService.updateBlog(updateBlogDto, blog_id, author_id);
 
-        return { message: 'Blog updated' };
+        return { message: 'Blog updated', blog };
     }
 
     @Post('delete-blog/:blog_id')

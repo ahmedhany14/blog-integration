@@ -13,4 +13,8 @@ export class ConfigService {
     get databaseConfig(): Config['database'] {
         return this.configService.get<Config['database']>('database');
     }
+
+    get redisConfig(): Config['redis'] {
+        return this.configService.get<Config['redis']>('redis');
+    }
 }

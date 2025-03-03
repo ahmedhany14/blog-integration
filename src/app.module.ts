@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { BlogModule } from './blog/blog.module';
 import { ConfigurationsModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConfigService } from './config/config.service';
         uri: configService.databaseConfig.url
       })
     }),
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

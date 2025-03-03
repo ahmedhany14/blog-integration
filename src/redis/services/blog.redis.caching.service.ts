@@ -43,4 +43,22 @@ export class BlogRedisCachingService {
         const is_added = await this.redisClient.pfadd(key, viewer_id);
         return is_added ? 1 : 0;
     }
+
+    async delAllBlogKeys(blog_id: string) {
+        let cursor = '0';
+        const keysToDelete: string[] = [];
+
+        do {
+            const [newCursor, keys] = await this.redisClient.scan(cursor, 'MATCH', `blog:*:${blog_id}`);
+
+            keysToDelete.push(...keys);
+            cursor = newCursor;
+
+        } while (cursor !== '0');
+
+        if (keysToDelete.length > 0) {
+            for (const key of keysToDelete)
+                await this.redisClient.del(key);
+        }
+    }
 }

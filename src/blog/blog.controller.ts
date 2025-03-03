@@ -71,6 +71,8 @@ export class BlogController {
             blog_id
         );
 
+        await this.blogRedisCachingService.delAllBlogKeys(blog_id);
+
         return { message: 'Blog deleted' };
     }
 

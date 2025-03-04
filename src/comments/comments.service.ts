@@ -53,4 +53,12 @@ export class CommentsService {
     async getBlogComments(blog_id: string, page: number) {
         return await this.commentsRepositoryService.getBlogComments(blog_id, page);
     }
+
+    async likeComment(comment_id: string, inc: number) {
+        return await this.commentsRepositoryService.likeComment(comment_id, inc);
+    }
+
+    async dislikeComment(comment_id: string, inc: number) {
+        return await this.commentsRepositoryService.dislikeComment(comment_id, inc);
+    }
 }

@@ -1,16 +1,25 @@
-import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, NotFoundException, Param, Patch, Post, Put, Query } from '@nestjs/common';
 
-import { CommentsService } from './comments.service';
+// dtos
 import { CreateCommentDto } from './dtos/create.comment.dto';
-import { response } from 'express';
-import { ObjectIdValidationPipe } from 'src/blog/validators/object.id.validation.pipe';
 import { UpdateCommentDto } from './dtos/update.comment.dto';
+
+// validators
+import { ObjectIdValidationPipe } from 'src/blog/validators/object.id.validation.pipe';
+
+// services
+import { CommentsService } from './comments.service';
+import { CommentRedisServiceService } from 'src/redis/services/commnet.redis.service.service';
+
 @Controller('comments')
 export class CommentsController {
 
     constructor(
         @Inject()
-        private readonly commentsService: CommentsService
+        private readonly commentsService: CommentsService,
+        @Inject()
+        private readonly commentRedisCachingService: CommentRedisServiceService
+
     ) { }
 
     @Post(":blog_id")
@@ -83,10 +92,18 @@ export class CommentsController {
         return response;
     }
 
-    @Patch(':comment_id/like')
-    async likeComment() { }
+    @Patch('like/:comment_id')
+    async likeComment(
+        @Param('comment_id', ObjectIdValidationPipe) comment_id: string
+    ) {
+        const comment = await this.commentsService.getComment(comment_id);
+        if (!comment) throw new NotFoundException('Comment not found');
 
-    @Patch(':comment_id/dislike')
+        const redis_ret = await 
+
+    }
+
+    @Patch('dislike/:comment_id')
     async dislikeComment() { }
 
     @Get(':comment_id/replies')

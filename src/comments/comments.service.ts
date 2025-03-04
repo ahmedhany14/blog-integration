@@ -1,7 +1,8 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 // Dtos
 import { CreateCommentDto } from './dtos/create.comment.dto';
+import { UpdateCommentDto } from './dtos/update.comment.dto';
 
 // Service
 import { BlogService } from 'src/blog/blog.service';
@@ -29,5 +30,27 @@ export class CommentsService {
 
     async getComment(comment_id: string) {
         return await this.commentsRepositoryService.getComment(comment_id);
+    }
+
+    async deleteComment(comment_id: string, deleter_id: number) {
+        const comment = await this.commentsRepositoryService.getComment(comment_id);
+
+        if (!comment) throw new NotFoundException('Comment not found');
+        if (comment.author_id !== deleter_id) throw new UnauthorizedException('You are not allowed to delete this comment');
+
+        await this.commentsRepositoryService.deleteComment(comment_id);
+    }
+
+    async updateComment(comment_id: string, updateCommentDto: UpdateCommentDto, updater_id: number) {
+        const comment = await this.commentsRepositoryService.getComment(comment_id);
+
+        if (!comment) throw new NotFoundException('Comment not found');
+        if (comment.author_id !== updater_id) throw new UnauthorizedException('You are not allowed to update this comment');
+
+        return await this.commentsRepositoryService.updateComment(comment_id, updateCommentDto);
+    }
+
+    async getBlogComments(blog_id: string, page: number) {
+        return await this.commentsRepositoryService.getBlogComments(blog_id, page);
     }
 }

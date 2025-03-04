@@ -1,9 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
+// Entity and Model
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment, CommentDocument } from './entity/comment.entity';
+
+// Dtos
 import { CreateCommentDto } from './dtos/create.comment.dto';
+import { UpdateCommentDto } from './dtos/update.comment.dto';
 
 @Injectable()
 export class CommentsRepositoryService {
@@ -38,6 +42,64 @@ export class CommentsRepositoryService {
             throw new InternalServerErrorException({
                 message: 'Error while fetching comment',
                 details: "can't fetch comment, please try again"
+            });
+        }
+    }
+
+    async deleteComment(comment_id: string): Promise<void> {
+        try {
+            await this.commentModel.findByIdAndDelete(comment_id);
+        } catch (e) {
+            throw new InternalServerErrorException({
+                message: 'Error while deleting comment',
+                details: "can't delete comment, please try again"
+            });
+        }
+    }
+
+    async updateComment(
+        comment_id: string,
+        updateCommentDto: UpdateCommentDto
+    ): Promise<CommentDocument> {
+        try {
+            return this.commentModel.findByIdAndUpdate(comment_id, updateCommentDto, { new: true });
+        } catch (e) {
+            throw new InternalServerErrorException({
+                message: 'Error while updating comment',
+                details: "can't update comment, please try again"
+            });
+        }
+    }
+
+
+    async getBlogComments(blog_id: string, page: number) {
+        try {
+            const data = await this.commentModel.find({ blog_id }).skip((page - 1) * 10).limit(10);
+
+            const totalComments = await this.commentModel.find({ blog_id }).countDocuments();
+            const totalPages = Math.ceil(totalComments * 1.0 / 10);
+            const hasNextPage = page < totalPages;
+
+            return {
+                response: data,
+                meta: {
+                    total: totalComments,
+                    page,
+                    limit: 10,
+                    totalPages,
+                    hasNextPage,
+                    firstPage: `blog_comments/${blog_id}?page=1`,
+                    lastPage: `blog_comments/${blog_id}?page=${totalPages}`,
+                    nextPage: hasNextPage ? `blog_comments/${blog_id}?page=${page + 1}` : null,
+                    prevPage: page > 1 ? `blog_comments/${blog_id}?page=${page - 1}` : null,
+                    currentPage: `blog_comments/${blog_id}?page=${page}`
+                }
+            }
+
+        } catch (e) {
+            throw new InternalServerErrorException({
+                message: 'Error while fetching comments',
+                details: "can't fetch comments, please try again"
             });
         }
     }

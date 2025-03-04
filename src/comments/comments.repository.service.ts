@@ -71,6 +71,28 @@ export class CommentsRepositoryService {
         }
     }
 
+    async likeComment(comment_id: string, inc: number) {
+        try {
+            return this.commentModel.findByIdAndUpdate(comment_id, { $inc: { likes: inc } });
+        } catch (e) {
+            throw new InternalServerErrorException({
+                message: 'Error while liking comment',
+                details: "can't like comment, please try again"
+            });
+        }
+
+    }
+
+    async dislikeComment(comment_id: string, inc: number) {
+        try {
+            return this.commentModel.findByIdAndUpdate(comment_id, { $inc: { dislikes: inc } });
+        } catch (e) {
+            throw new InternalServerErrorException({
+                message: 'Error while disliking comment',
+                details: "can't dislike comment, please try again"
+            });
+        }
+    }
 
     async getBlogComments(blog_id: string, page: number) {
         try {

@@ -97,4 +97,20 @@ export class CommentRedisServiceService {
             return { like: 0, dislike: 1 };
         }
     }
+
+    async delAllCommnetKeys(commnet_id: string) {
+        let cursor = '0';
+        const keysToDelete: string[] = [];
+
+        do {
+            const [newCursor, keys] = await this.redisClient.scan(cursor, 'MATCH', `commnet:*:${commnet_id}`);
+            cursor = newCursor;
+            keysToDelete.push(...keys);
+        } while (cursor !== '0');
+
+        for (const key of keysToDelete) {
+            await this.redisClient.del(key);
+        }
+    }
+
 }

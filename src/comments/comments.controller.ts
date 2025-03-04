@@ -58,7 +58,10 @@ export class CommentsController {
         @Param('comment_id', ObjectIdValidationPipe) comment_id: string
     ) {
         const deleter_id = 1; // Get Deleter ID from Auth Service or JWT Token in Real World or your application
+
         await this.commentsService.deleteComment(comment_id, deleter_id);
+        await this.commentRedisCachingService.delAllCommnetKeys(comment_id);
+
         return {
             response: {
                 message: "Comment Deleted Successfully",
@@ -99,12 +102,42 @@ export class CommentsController {
         const comment = await this.commentsService.getComment(comment_id);
         if (!comment) throw new NotFoundException('Comment not found');
 
-        const redis_ret = await 
+        const liker_id = 1; // Get Liker ID from Auth Service or JWT Token in Real World or your application
+        const redis_ret = await this.commentRedisCachingService.setLikeToComment(comment_id, liker_id);
+
+
+        await this.commentsService.likeComment(comment_id, redis_ret.like);
+        await this.commentsService.dislikeComment(comment_id, redis_ret.dislike);
+
+        return {
+            response: {
+                like: redis_ret.like === 1 ? 'Comment Liked' : 'Comment Like Removed',
+                dislike: redis_ret.dislike === 1 ? 'Comment Disliked' : 'Comment Dislike Removed'
+            }
+        }
 
     }
 
     @Patch('dislike/:comment_id')
-    async dislikeComment() { }
+    async dislikeComment(
+        @Param('comment_id', ObjectIdValidationPipe) comment_id: string
+    ) {
+        const comment = await this.commentsService.getComment(comment_id);
+        if (!comment) throw new NotFoundException('Comment not found');
+
+        const disliker_id = 1; // Get Disliker ID from Auth Service or JWT Token in Real World or your application
+        const redis_ret = await this.commentRedisCachingService.setDislikeToComment(comment_id, disliker_id);
+
+        await this.commentsService.likeComment(comment_id, redis_ret.like);
+        await this.commentsService.dislikeComment(comment_id, redis_ret.dislike);
+
+        return {
+            response: {
+                like: redis_ret.like === 1 ? 'Comment Liked' : 'Comment Like Removed',
+                dislike: redis_ret.dislike === 1 ? 'Comment Disliked' : 'Comment Dislike Removed'
+            }
+        }
+    }
 
     @Get(':comment_id/replies')
     async getReplies() {

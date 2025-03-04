@@ -7,6 +7,7 @@ import { BlogModule } from './blog/blog.module';
 import { ConfigurationsModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { RedisModule } from './redis/redis.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RedisModule } from './redis/redis.module';
       })
     }),
     RedisModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

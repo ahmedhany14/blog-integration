@@ -1,14 +1,47 @@
-import { Controller, Delete, Get, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Put } from '@nestjs/common';
 
+import { CommentsService } from './comments.service';
+import { CreateCommentDto } from './dtos/create.comment.dto';
+import { response } from 'express';
+import { ObjectIdValidationPipe } from 'src/blog/validators/object.id.validation.pipe';
 @Controller('comments')
 export class CommentsController {
 
+    constructor(
+        @Inject()
+        private readonly commentsService: CommentsService
+    ) { }
 
-    @Post()
-    async addComment() { }
+    @Post(":blog_id")
+    async addComment(
+        @Body() createCommnetDto: CreateCommentDto,
+        @Param('blog_id', ObjectIdValidationPipe) blog_id: string
+    ) {
+        const author_id = 1; // Get Author ID from Auth Service or JWT Token in Real World or your application
+
+        const comment = await this.commentsService.addComment(createCommnetDto, blog_id, author_id);
+
+        return {
+            response: {
+                message: "Comment Added Successfully",
+                data: comment
+            }
+        }
+    }
 
     @Get(':comment_id')
-    async getComment() { }
+    async getComment(
+        @Param('comment_id', ObjectIdValidationPipe) comment_id: string
+    ) { 
+        const comment = await this.commentsService.getComment(comment_id);
+        return {
+            response: {
+                message: "Comment Fetched Successfully",
+                data: comment
+            }
+        }
+
+    }
 
     @Delete(':comment_id')
     async deleteComment() { }

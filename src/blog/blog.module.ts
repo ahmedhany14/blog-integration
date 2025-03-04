@@ -18,5 +18,6 @@ import { RedisModule } from 'src/redis/redis.module';
     ],
     controllers: [BlogController],
     providers: [BlogService, BlogRepositoryService],
+    exports: [BlogService, BlogRepositoryService]
 })
 export class BlogModule { }

@@ -25,7 +25,7 @@ import { CommentRedisServiceService } from './services/commnet.redis.service.ser
         CommentRedisServiceService,
     ],
 
-    exports: [BlogRedisCachingService],
+    exports: [BlogRedisCachingService, CommentRedisServiceService],
 
 })
 export class RedisModule { }

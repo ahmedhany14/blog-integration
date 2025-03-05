@@ -5,6 +5,7 @@ import { CommentsRepositoryService } from './comments.repository.service';
 import { BlogModule } from 'src/blog/blog.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './entity/comment.entity';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [BlogModule,
@@ -14,7 +15,7 @@ import { Comment, CommentSchema } from './entity/comment.entity';
         schema: CommentSchema,
       }
     ],
-    )],
+    ), RedisModule],
 
   controllers: [CommentsController],
   providers: [CommentsService, CommentsRepositoryService],

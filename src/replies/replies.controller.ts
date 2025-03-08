@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Inject, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 
 // services
 import { RepliesService } from './replies.service';
@@ -38,13 +38,28 @@ export class RepliesController {
 
         const reply_by = 1; // Get Author ID from Auth Service or JWT Token in Real World or your application
 
-        await this.repliesService.addReply(createReplyDto, reply_by, reply_to, comment_id);
+        const reply = await this.repliesService.addReply(createReplyDto, reply_by, reply_to, comment_id);
 
 
         return {
             response: {
                 message: "Reply Added Successfully",
-                data: {}
+                data: reply
+            }
+        }
+    }
+
+    @Get(':comment_id')
+    async getCommentReplies(
+        @Param('comment_id', ObjectIdValidationPipe) comment_id: string
+    ) {
+
+        const replies = await this.repliesService.getReplies(comment_id);
+
+        return {
+            response: {
+                message: "Replies Fetched Successfully",
+                data: replies
             }
         }
     }

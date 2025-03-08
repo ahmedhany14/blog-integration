@@ -15,7 +15,7 @@ export class BlogController {
 
     ) { }
 
-    @Post('create-blog/:author_id')
+    @Post('create-blog')
     async createBlog(
         @Body() createBlogDto: CreateBlogDto,
     ) {
@@ -58,7 +58,7 @@ export class BlogController {
         @Param('blog_id', ObjectIdValidationPipe) blog_id: string,
         @Body() updateBlogDto: UpdateBlogDto,
     ) {
-        const author_id = 1; // Get Author ID from Auth Service or JWT Token in Real World or your application
+        const author_id = 10; // Get Author ID from Auth Service or JWT Token in Real World or your application
 
         const blog = await this.blogService.updateBlog(updateBlogDto, blog_id, author_id);
 

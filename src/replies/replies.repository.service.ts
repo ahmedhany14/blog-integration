@@ -30,4 +30,20 @@ export class RepliesRepositoryService {
             })
         }
     }
+
+    async getReplies(comment_id: string) {
+        try {
+            return await this.repliesModel.find({
+                comment_id
+            }).populate('reply_to')
+                .populate('reply_by')
+                .sort({ createdAt: 1 });
+        }
+        catch (err) {
+            throw new InternalServerErrorException({
+                message: 'Error fetching replies',
+                details: err.message
+            })
+        }
+    }
 }

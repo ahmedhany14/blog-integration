@@ -17,9 +17,10 @@ export class BlogController {
 
     @Post('create-blog/:author_id')
     async createBlog(
-        @Param('author_id', ParseIntPipe) author_id: number,
         @Body() createBlogDto: CreateBlogDto,
     ) {
+        const author_id = 1; // Get Author ID from Auth Service or JWT Token in Real World or your application
+
         const blog = await this.blogService.createBlog(createBlogDto, author_id);
         return { message: 'Blog created', blog };
     }
@@ -32,9 +33,10 @@ export class BlogController {
             Cache the views of the blog
         */
         let blog;
+        const viewer_id = 1; // Get Viewer ID from Auth Service or JWT Token in Real World or your application
 
         // NOTE: The second arg will be fixed after adding authentication
-        if (await this.blogRedisCachingService.incViews(blog_id, 10))
+        if (await this.blogRedisCachingService.incViews(blog_id, viewer_id))
             blog = await this.blogService.incrementViews(blog_id);
         else
             blog = await this.blogService.getOneBlog(blog_id);
@@ -51,22 +53,24 @@ export class BlogController {
         return { message: 'Blogs fetched', blogs };
     }
 
-    @Patch('update-blog/:author_id/:blog_id')
+    @Patch('update-blog/:blog_id')
     async updateBlog(
-        @Param('author_id', ParseIntPipe) author_id: number,
         @Param('blog_id', ObjectIdValidationPipe) blog_id: string,
         @Body() updateBlogDto: UpdateBlogDto,
     ) {
+        const author_id = 1; // Get Author ID from Auth Service or JWT Token in Real World or your application
+
         const blog = await this.blogService.updateBlog(updateBlogDto, blog_id, author_id);
 
         return { message: 'Blog updated', blog };
     }
 
-    @Delete('delete-blog/:author_id/:blog_id')
+    @Delete('delete-blog/:blog_id')
     async deleteBlog(
-        @Param('author_id', ParseIntPipe) author_id: number,
         @Param('blog_id', ObjectIdValidationPipe) blog_id: string,
     ) {
+        const author_id = 1; // Get Author ID from Auth Service or JWT Token in Real World or your application
+
         await this.blogService.deleteBlog(
             author_id,
             blog_id
@@ -77,11 +81,12 @@ export class BlogController {
         return { message: 'Blog deleted' };
     }
 
-    @Post('upvote-blog/:blog_id/:upvoter_id')
+    @Post('upvote-blog/:blog_id')
     async upvoteBlog(
         @Param('blog_id', ObjectIdValidationPipe) blog_id: string,
-        @Param('upvoter_id', ParseIntPipe) upvoter_id: number
     ) {
+        const upvoter_id = 1; // Get Upvoter ID from Auth Service or JWT Token in Real World or your application
+
         const blog = await this.blogService.getOneBlog(blog_id);
 
         if (!blog) throw new NotFoundException('Blog not found');
@@ -99,11 +104,12 @@ export class BlogController {
         };
     }
 
-    @Post('downvote-blog/:blog_id/:downvoter_id')
+    @Post('downvote-blog/:blog_id')
     async downvoteBlog(
         @Param('blog_id') blog_id: string,
-        @Param('downvoter_id', ParseIntPipe) downvoter_id: number
     ) {
+        const downvoter_id = 1; // Get Downvoter ID from Auth Service or JWT Token in Real World or your application
+
         const blog = await this.blogService.getOneBlog(blog_id);
         if (!blog) throw new NotFoundException('Blog not found');
 

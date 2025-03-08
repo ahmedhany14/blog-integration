@@ -8,16 +8,17 @@ import { Comment, CommentSchema } from './entity/comment.entity';
 import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [BlogModule,
-    MongooseModule.forFeature([
-      {
-        name: Comment.name,
-        schema: CommentSchema,
-      }
-    ],
-    ), RedisModule],
+    imports: [BlogModule,
+        MongooseModule.forFeature([
+            {
+                name: Comment.name,
+                schema: CommentSchema,
+            }
+        ],
+        ), RedisModule],
 
-  controllers: [CommentsController],
-  providers: [CommentsService, CommentsRepositoryService],
+    controllers: [CommentsController],
+    providers: [CommentsService, CommentsRepositoryService],
+    exports: [CommentsService]
 })
 export class CommentsModule { }

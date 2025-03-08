@@ -9,7 +9,9 @@ import { ObjectIdValidationPipe } from 'src/blog/validators/object.id.validation
 
 // services
 import { CommentsService } from './comments.service';
-import { CommentRedisServiceService } from 'src/redis/services/commnet.redis.service.service';
+import { ReactisRedisCachingService } from 'src/redis/services/reactis.redis.caching.service';
+
+import { types } from 'src/enums/react.to.types';
 
 @Controller('comments')
 export class CommentsController {
@@ -17,9 +19,9 @@ export class CommentsController {
     constructor(
         @Inject()
         private readonly commentsService: CommentsService,
-        @Inject()
-        private readonly commentRedisCachingService: CommentRedisServiceService
 
+        @Inject()
+        private readonly reactisRedisCachingService: ReactisRedisCachingService
     ) { }
 
     @Post(":blog_id")
@@ -60,7 +62,7 @@ export class CommentsController {
         const deleter_id = 1; // Get Deleter ID from Auth Service or JWT Token in Real World or your application
 
         await this.commentsService.deleteComment(comment_id, deleter_id);
-        await this.commentRedisCachingService.delAllCommnetKeys(comment_id);
+        await this.reactisRedisCachingService.delAllKeys(types.COMMENT, comment_id);
 
         return {
             response: {
@@ -103,7 +105,7 @@ export class CommentsController {
         if (!comment) throw new NotFoundException('Comment not found');
 
         const liker_id = 1; // Get Liker ID from Auth Service or JWT Token in Real World or your application
-        const redis_ret = await this.commentRedisCachingService.setLikeToComment(comment_id, liker_id);
+        const redis_ret = await this.reactisRedisCachingService.setDislike(types.COMMENT, comment_id, liker_id);
 
 
         await this.commentsService.likeComment(comment_id, redis_ret.like);
@@ -126,7 +128,7 @@ export class CommentsController {
         if (!comment) throw new NotFoundException('Comment not found');
 
         const disliker_id = 1; // Get Disliker ID from Auth Service or JWT Token in Real World or your application
-        const redis_ret = await this.commentRedisCachingService.setDislikeToComment(comment_id, disliker_id);
+        const redis_ret = await this.reactisRedisCachingService.setDislike(types.COMMENT, comment_id, disliker_id);
 
         await this.commentsService.likeComment(comment_id, redis_ret.like);
         await this.commentsService.dislikeComment(comment_id, redis_ret.dislike);
@@ -137,21 +139,5 @@ export class CommentsController {
                 dislike: redis_ret.dislike === 1 ? 'Comment Disliked' : 'Comment Dislike Removed'
             }
         }
-    }
-
-    @Get(':comment_id/replies')
-    async getReplies() {
-        /*
-            Not Planned Yet
-        */
-        return "Not Planned Yet"
-    }
-
-    @Post(':comment_id/replies')
-    async addReply() {
-        /*
-            Not Planned Yet
-        */
-        return "Not Planned Yet"
     }
 }

@@ -4,6 +4,8 @@ import { CreateBlogDto } from './dtos/create.blog.dto';
 import { ObjectIdValidationPipe } from './validators/object.id.validation.pipe';
 import { UpdateBlogDto } from './dtos/update.blog.dto';
 import { BlogRedisCachingService } from '../redis/services/blog.redis.caching.service';
+import { ReactisRedisCachingService } from '../redis/services/reactis.redis.caching.service';
+import { types } from 'src/enums/react.to.types';
 @Controller('blog')
 export class BlogController {
     constructor(
@@ -11,8 +13,10 @@ export class BlogController {
         private readonly blogService: BlogService,
 
         @Inject()
-        private readonly blogRedisCachingService: BlogRedisCachingService
+        private readonly blogRedisCachingService: BlogRedisCachingService,
 
+        @Inject()
+        private readonly reactisRedisCachingService: ReactisRedisCachingService
     ) { }
 
     @Post('create-blog')
@@ -76,7 +80,7 @@ export class BlogController {
             blog_id
         );
 
-        await this.blogRedisCachingService.delAllBlogKeys(blog_id);
+        await this.reactisRedisCachingService.delAllKeys(types.BLOG, blog_id);
 
         return { message: 'Blog deleted' };
     }
@@ -91,15 +95,15 @@ export class BlogController {
 
         if (!blog) throw new NotFoundException('Blog not found');
 
-        const ret = await this.blogRedisCachingService.setUpVote(blog_id, upvoter_id);
+        const ret = await this.reactisRedisCachingService.setLikeTo(types.BLOG, blog_id, upvoter_id);
 
-        await this.blogService.upvoteBlog(blog_id, ret.upvote);
-        await this.blogService.downvoteBlog(blog_id, ret.downvote);
+        await this.blogService.upvoteBlog(blog_id, ret.like);
+        await this.blogService.downvoteBlog(blog_id, ret.like);
 
         return {
             message: {
-                upvote: ret.upvote === 1 ? 'Blog upvoted' : 'Blog upvote removed',
-                downvote: ret.downvote === 1 ? 'Blog downvoted' : 'Blog downvote removed'
+                upvote: ret.like === 1 ? 'Blog upvoted' : 'Blog upvote removed',
+                downvote: ret.dislike === 1 ? 'Blog downvoted' : 'Blog downvote removed'
             }
         };
     }
@@ -113,16 +117,16 @@ export class BlogController {
         const blog = await this.blogService.getOneBlog(blog_id);
         if (!blog) throw new NotFoundException('Blog not found');
 
-        const ret = await this.blogRedisCachingService.setDownVote(blog_id, downvoter_id); // 1 ? will increase the downvote count : -1 ? will decrease the downvote count
+        const ret = await this.reactisRedisCachingService.setDislike(types.BLOG, blog_id, downvoter_id); // 1 ? will increase the downvote count : -1 ? will decrease the downvote count
 
-        await this.blogService.upvoteBlog(blog_id, ret.upvote);
-        await this.blogService.downvoteBlog(blog_id, ret.downvote);
+        await this.blogService.upvoteBlog(blog_id, ret.like);
+        await this.blogService.downvoteBlog(blog_id, ret.dislike);
 
 
         return {
             message: {
-                upvote: ret.upvote === 1 ? 'Blog upvoted' : 'Blog upvote removed',
-                downvote: ret.downvote === 1 ? 'Blog downvoted' : 'Blog downvote removed'
+                upvote: ret.like === 1 ? 'Blog upvoted' : 'Blog upvote removed',
+                downvote: ret.dislike === 1 ? 'Blog downvoted' : 'Blog downvote removed'
             }
         };
     }

@@ -2,21 +2,22 @@ import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 
 import {
-    COMMENT_LIKES_KEY,
-    COMMENT_DISLIKES_KEY
-} from '../comments.keys';
+    LIKES_KEY,
+    DISLIKES_KEY,
+} from '../keys';
 
+import { types } from 'src/enums/react.to.types';
 
 @Injectable()
-export class CommentRedisServiceService {
-
+export class ReactisRedisCachingService {
     constructor(
         @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
     ) { }
 
 
-    async setLikeToComment(
-        comment_id: string,
+    async setLikeTo(
+        type: types,
+        id: string,
         liker_id: number
     ) {
         /*
@@ -34,8 +35,8 @@ export class CommentRedisServiceService {
             3) if the user is not in the likes set, i will return { like: 1, dislike: 0 }, to indicate that the like was
         */
 
-        const dislike_key = COMMENT_DISLIKES_KEY(comment_id);
-        const like_key = COMMENT_LIKES_KEY(comment_id);
+        const dislike_key = DISLIKES_KEY(type, id);
+        const like_key = LIKES_KEY(type, id);
 
         const is_disliker = await this.redisClient.sismember(dislike_key, liker_id);
 
@@ -57,8 +58,9 @@ export class CommentRedisServiceService {
         }
     }
 
-    async setDislikeToComment(
-        comment_id: string,
+    async setDislike(
+        type: types,
+        id: string,
         disliker_id: number
     ) {
         /*
@@ -76,8 +78,8 @@ export class CommentRedisServiceService {
             3) if the user is not in the dislikes set, i will return { like: 0, dislike: 1 }, to indicate that the dislike was added
         */
 
-        const like_key = COMMENT_LIKES_KEY(comment_id);
-        const dislike_key = COMMENT_DISLIKES_KEY(comment_id);
+        const like_key = LIKES_KEY(type, id);
+        const dislike_key = DISLIKES_KEY(type, id);
 
         const is_liker = await this.redisClient.sismember(like_key, disliker_id);
 
@@ -98,12 +100,14 @@ export class CommentRedisServiceService {
         }
     }
 
-    async delAllCommnetKeys(commnet_id: string) {
+    async delAllKeys(
+        type: types,
+        id: string) {
         let cursor = '0';
         const keysToDelete: string[] = [];
 
         do {
-            const [newCursor, keys] = await this.redisClient.scan(cursor, 'MATCH', `commnet:*:${commnet_id}`);
+            const [newCursor, keys] = await this.redisClient.scan(cursor, 'MATCH', `${type}:*:${id}`);
             cursor = newCursor;
             keysToDelete.push(...keys);
         } while (cursor !== '0');
@@ -113,4 +117,7 @@ export class CommentRedisServiceService {
         }
     }
 
+
 }
+
+

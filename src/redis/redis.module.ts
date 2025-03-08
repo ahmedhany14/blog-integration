@@ -4,13 +4,12 @@ import Redis from 'ioredis';
 import { ConfigurationsModule } from './../config/config.module';
 import { ConfigService } from 'src/config/config.service';
 import { BlogRedisCachingService } from './services/blog.redis.caching.service';
-import { CommentRedisServiceService } from './services/commnet.redis.service.service';
+import { ReactisRedisCachingService } from './services/reactis.redis.caching.service';
 
 @Module({
     imports: [ConfigurationsModule],
     providers: [
         {
-
             provide: 'REDIS_CLIENT',
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => {
@@ -22,10 +21,10 @@ import { CommentRedisServiceService } from './services/commnet.redis.service.ser
             },
         },
         BlogRedisCachingService,
-        CommentRedisServiceService,
+        ReactisRedisCachingService,
     ],
 
-    exports: [BlogRedisCachingService, CommentRedisServiceService],
+    exports: [BlogRedisCachingService, ReactisRedisCachingService],
 
 })
 export class RedisModule { }

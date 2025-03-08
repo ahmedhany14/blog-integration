@@ -3,8 +3,11 @@ import {
     Schema,
     SchemaFactory
 } from '@nestjs/mongoose';
+import e from 'express';
 
 import mongoose, { Document } from 'mongoose';
+
+export type RepliesDocument = Replies & Document;
 
 @Schema({
     timestamps: true,
@@ -59,3 +62,5 @@ export class Replies extends Document {
     })
     dislikes: number;
 }
+
+export const RepliesSchema = SchemaFactory.createForClass(Replies);

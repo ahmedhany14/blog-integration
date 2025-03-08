@@ -1,6 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RepliesRepositoryService } from './replies.repository.service';
 import { CreateReplyDto } from './dto/create.reply.dto';
+import { UpdateReplyDto } from './dto/update.reply.dto';
 
 @Injectable()
 export class RepliesService {
@@ -17,5 +18,44 @@ export class RepliesService {
 
     async getReplies(comment_id: string) {
         return this.repliesRepositoryService.getReplies(comment_id);
+    }
+
+    async getReply(reply_id: string) {
+        return this.repliesRepositoryService.getReply(reply_id);
+    }
+
+    async deleteReply(reply_id: string, reply_by: number) {
+        const reply = await this.repliesRepositoryService.getReply(reply_id);
+        if (!reply) {
+            throw new NotFoundException({
+                message: "Reply Not Found"
+            });
+        }
+
+        if (reply.reply_by !== reply_by) {
+            throw new UnauthorizedException({
+                message: "You are not allowed to delete this reply"
+            });
+        }
+
+        this.repliesRepositoryService.deleteReply(reply_id);
+    }
+
+
+    async updateReply(reply_id: string, reply_by: number, updateReplyDto: UpdateReplyDto) {
+        const reply = await this.repliesRepositoryService.getReply(reply_id);
+        if (!reply) {
+            throw new NotFoundException({
+                message: "Reply Not Found"
+            });
+        }
+
+        if (reply.reply_by !== reply_by) {
+            throw new UnauthorizedException({
+                message: "You are not allowed to update this reply"
+            });
+        }
+
+        return this.repliesRepositoryService.updateReply(reply_id, updateReplyDto);
     }
 }

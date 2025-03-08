@@ -9,6 +9,7 @@ import { ObjectIdValidationPipe } from 'src/blog/validators/object.id.validation
 // dto
 import { CreateReplyDto } from './dto/create.reply.dto';
 import { CommentsService } from 'src/comments/comments.service';
+import { UpdateReplyDto } from './dto/update.reply.dto';
 
 @Controller('replies')
 export class RepliesController {
@@ -65,20 +66,39 @@ export class RepliesController {
     }
 
     @Patch(':reply_id')
-    async updateReply() {
-        // Update Reply Logic Here
+    async updateReply(
+        @Param('reply_id', ObjectIdValidationPipe) reply_id: string,
+        @Body() updateReplyDto: UpdateReplyDto
+    ) {
+
+        const reply_by = 2; // Get Author ID from Auth Service or JWT Token in Real World or your application
+
+        const reply = await this.repliesService.updateReply(
+            reply_id,
+            reply_by,
+            updateReplyDto
+        );
+
 
         return {
             response: {
                 message: "Reply Updated Successfully",
-                data: {}
+                data: reply
             }
         }
     }
 
     @Delete(':reply_id')
-    async deleteReply() {
-        // Delete Reply Logic Here
+    async deleteReply(
+        @Param('reply_id', ObjectIdValidationPipe) reply_id: string
+    ) {
+
+        const reply_by = 2; // Get Author ID from Auth Service or JWT Token in Real World or your application
+
+        await this.repliesService.deleteReply(
+            reply_id,
+            reply_by
+        );
 
         return {
             response: {
@@ -91,7 +111,6 @@ export class RepliesController {
 
     @Patch('like/:reply_id')
     async likeReply() {
-        // Like Reply Logic Here
 
         return {
             response: {

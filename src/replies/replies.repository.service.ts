@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Replies, RepliesDocument } from './entity/replies.entity';
 import { Model } from 'mongoose';
 import { CreateReplyDto } from './dto/create.reply.dto';
+import { UpdateReplyDto } from './dto/update.reply.dto';
 
 @Injectable()
 export class RepliesRepositoryService {
@@ -12,6 +13,17 @@ export class RepliesRepositoryService {
         private readonly repliesModel: Model<RepliesDocument>
     ) { }
 
+    async getReply(reply_id: string) {
+        try {
+            return await this.repliesModel.findById(reply_id);
+        }
+        catch (err) {
+            throw new InternalServerErrorException({
+                message: 'Error fetching reply',
+                details: err.message
+            })
+        }
+    }
 
     async addReply(createReplyDto: CreateReplyDto, reply_by: number, reply_to: number, comment_id: string) {
         try {
@@ -42,6 +54,31 @@ export class RepliesRepositoryService {
         catch (err) {
             throw new InternalServerErrorException({
                 message: 'Error fetching replies',
+                details: err.message
+            })
+        }
+    }
+
+    async updateReply(reply_id: string, updateReplyDto: UpdateReplyDto) {
+        try {
+            return await this.repliesModel.findByIdAndUpdate
+                (reply_id, updateReplyDto, { new: true });
+        }
+        catch (err) {
+            throw new InternalServerErrorException({
+                message: 'Error updating reply',
+                details: err.message
+            })
+        }
+    }
+
+    async deleteReply(reply_id: string) {
+        try {
+            await this.repliesModel.findByIdAndDelete(reply_id);
+        }
+        catch (err) {
+            throw new InternalServerErrorException({
+                message: 'Error deleting reply',
                 details: err.message
             })
         }

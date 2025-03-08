@@ -8,6 +8,7 @@ import { ConfigurationsModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { RedisModule } from './redis/redis.module';
 import { CommentsModule } from './comments/comments.module';
+import { RepliesModule } from './replies/replies.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentsModule } from './comments/comments.module';
     }),
     RedisModule,
     CommentsModule,
+    RepliesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

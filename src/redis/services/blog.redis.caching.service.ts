@@ -3,8 +3,6 @@ import Redis from 'ioredis';
 
 import {
     BLOG_VIEWS_KEY,
-    BLOG_UPVOTES_KEY,
-    BLOG_DOWNVOTES_KEY
 } from '../blogs.keys';
 
 @Injectable()

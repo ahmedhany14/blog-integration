@@ -105,7 +105,7 @@ export class CommentsController {
         if (!comment) throw new NotFoundException('Comment not found');
 
         const liker_id = 1; // Get Liker ID from Auth Service or JWT Token in Real World or your application
-        const redis_ret = await this.reactisRedisCachingService.setDislike(types.COMMENT, comment_id, liker_id);
+        const redis_ret = await this.reactisRedisCachingService.setLikeTo(types.COMMENT, comment_id, liker_id);
 
 
         await this.commentsService.likeComment(comment_id, redis_ret.like);

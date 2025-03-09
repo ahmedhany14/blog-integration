@@ -83,4 +83,36 @@ export class RepliesRepositoryService {
             })
         }
     }
+
+    async likeReply(reply_id: string, inc: number) {
+        try {
+            return await this.repliesModel.findByIdAndUpdate(
+                reply_id,
+                { $inc: { likes: inc } },
+                { new: true }
+            );
+        }
+        catch (err) {
+            throw new InternalServerErrorException({
+                message: 'Error liking reply',
+                details: err.message
+            })
+        }
+    }
+
+    async dislikeReply(reply_id: string, inc: number) {
+        try {
+            return await this.repliesModel.findByIdAndUpdate(
+                reply_id,
+                { $inc: { dislikes: inc } },
+                { new: true }
+            );
+        }
+        catch (err) {
+            throw new InternalServerErrorException({
+                message: 'Error disliking reply',
+                details: err.message
+            })
+        }
+    }
 }

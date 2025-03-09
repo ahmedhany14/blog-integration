@@ -58,4 +58,12 @@ export class RepliesService {
 
         return this.repliesRepositoryService.updateReply(reply_id, updateReplyDto);
     }
+
+    async likeReply(reply_id: string, inc: number) {
+        return this.repliesRepositoryService.likeReply(reply_id, inc);
+    }
+
+    async dislikeReply(reply_id: string, inc: number) {
+        return this.repliesRepositoryService.dislikeReply(reply_id, inc);
+    }
 }

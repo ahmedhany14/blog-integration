@@ -98,7 +98,7 @@ export class BlogController {
         const ret = await this.reactisRedisCachingService.setLikeTo(types.BLOG, blog_id, upvoter_id);
 
         await this.blogService.upvoteBlog(blog_id, ret.like);
-        await this.blogService.downvoteBlog(blog_id, ret.like);
+        await this.blogService.downvoteBlog(blog_id, ret.dislike);
 
         return {
             message: {

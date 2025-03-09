@@ -5,13 +5,15 @@ import { RepliesRepositoryService } from './replies.repository.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Replies, RepliesSchema } from './entity/replies.entity';
 import { CommentsModule } from 'src/comments/comments.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([
             { name: Replies.name, schema: RepliesSchema }
         ]),
-        CommentsModule
+        CommentsModule,
+        RedisModule
     ],
     controllers: [RepliesController],
     providers: [RepliesService, RepliesRepositoryService]

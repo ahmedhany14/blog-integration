@@ -10,6 +10,9 @@ import { ObjectIdValidationPipe } from 'src/blog/validators/object.id.validation
 import { CreateReplyDto } from './dto/create.reply.dto';
 import { CommentsService } from 'src/comments/comments.service';
 import { UpdateReplyDto } from './dto/update.reply.dto';
+import { ReactisRedisCachingService } from '../redis/services/reactis.redis.caching.service';
+import { types } from 'src/enums/react.to.types';
+
 
 @Controller('replies')
 export class RepliesController {
@@ -19,7 +22,10 @@ export class RepliesController {
         private readonly repliesService: RepliesService,
 
         @Inject()
-        private readonly commentsService: CommentsService
+        private readonly commentsService: CommentsService,
+
+        @Inject()
+        private readonly reactisRedisCachingService: ReactisRedisCachingService
     ) { }
 
 
@@ -110,25 +116,57 @@ export class RepliesController {
 
 
     @Patch('like/:reply_id')
-    async likeReply() {
+    async likeReply(
+        @Param('reply_id', ObjectIdValidationPipe) reply_id: string
+    ) {
+        const reply = await this.repliesService.getReply(reply_id);
+        if (!reply) {
+            throw new NotFoundException({
+                message: "Reply Not Found",
+            });
+        }
+
+        const liker_id = 1; // Get Liker ID from Auth Service or JWT Token in Real World or your application
+
+        const redis_ret = await this.reactisRedisCachingService.setLikeTo(types.REPLY, reply_id, liker_id);
+
+        await this.repliesService.likeReply(reply_id, redis_ret.like);
+        await this.repliesService.dislikeReply(reply_id, redis_ret.dislike);
 
         return {
             response: {
                 message: "Reply Liked Successfully",
-                data: {}
+                like: redis_ret.like === 1 ? 'Reply Liked' : 'Reply Like Removed',
+                dislike: redis_ret.dislike === 1 ? 'Reply Disliked' : 'Reply Dislike Removed'
             }
         }
     }
 
 
     @Patch('dislike/:reply_id')
-    async dislikeReply() {
-        // Dislike Reply Logic Here
+    async dislikeReply(
+        @Param('reply_id', ObjectIdValidationPipe) reply_id: string
+    ) {
+        const reply = await this.repliesService.getReply(reply_id);
+        if (!reply) {
+            throw new NotFoundException({
+                message: "Reply Not Found",
+            });
+        }
+
+        const disliker_id = 1; // Get Disliker ID from Auth Service or JWT Token in Real World or your application
+
+        const redis_ret = await this.reactisRedisCachingService.setDislike(types.REPLY, reply_id, disliker_id);
+
+        await this.repliesService.likeReply(reply_id, redis_ret.like);
+        await this.repliesService.dislikeReply(reply_id, redis_ret.dislike);
+
 
         return {
             response: {
                 message: "Reply Disliked Successfully",
-                data: {}
+                like: redis_ret.like === 1 ? 'Reply Liked' : 'Reply Like Removed',
+                dislike: redis_ret.dislike === 1 ? 'Reply Disliked' : 'Reply Dislike Removed'
             }
         }
     }
